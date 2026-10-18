@@ -1,0 +1,199 @@
+/* サイト全体で共通のもの: 80 年代のパソコンのカタログの紙面（白い紙、黒い題の帯と横じま）。
+   トップ（index.html）・作品のページ（fm7/player.css と一緒に）・ライセンス・404 が読む */
+:root {
+  --paper: #fbfbf8;
+  --ink: #111;
+  --mut: #6b6b6b;
+  --rule: #d4d4d0;
+  --band: #0a0a0a;
+  --red: #d7261e;
+  --yellow: #ffe14d;
+  --blue: #1f6fd1;
+  --blue-hi: #2f85ee;
+  --grape: #3b1d63;  /* ヘッダーと題の帯の地（女の子の髪の影の紫） */
+  /* 地の模様: 作品のディスクの中身の 16 進ダンプを薄く敷き、女の子の後ろから集中線を広げる（.burst） */
+  --grape-bg: url(/img/hexdump.svg) 0 0 / 640px 352px, var(--grape);
+  --burst: repeating-conic-gradient(rgba(255, 255, 255, 0.075) 0 5deg, transparent 5deg 12deg);
+  --bz1: #2c2c30;
+  --bz2: #151517;
+  --bzink: #8d8d92;
+  --lamp-off: #3a2c2a;
+  --lamp-pwr: #43e06a;
+  --lamp-drv: #ff4a2a;
+  /* 見出しの書体: 一番大きい所（サイト名・題名）は Dela Gothic One。それより小さい所（キャッチコピー・カードの題名）は
+     Mochiy Pop One（Dela Gothic One は線が太く、小さいと画数の多い漢字が潰れる） */
+  --disp: "Dela Gothic One", "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+  --pop: "Mochiy Pop One", "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+  --ui: "Zen Kaku Gothic New", system-ui, -apple-system, "Hiragino Sans", sans-serif;
+  --mono: "M PLUS 1 Code", ui-monospace, monospace;
+  --round: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", var(--ui);
+  --stripes: linear-gradient(var(--yellow) 0 22%, transparent 22% 33%, #ffae1f 33% 55%, transparent 55% 66%,
+                             #f26b1d 66% 82%, transparent 82% 88%, var(--red) 88%);
+  --gutter-l: max(16px, env(safe-area-inset-left));
+  --gutter-r: max(16px, env(safe-area-inset-right));
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--ui);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+a { color: inherit; }
+
+/* 中身の幅の枠（トップ・ライセンス・404） */
+.wrap {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-left: var(--gutter-l);
+  padding-right: var(--gutter-r);
+}
+
+/* 黄・橙・赤の横じま */
+.stripes { height: 14px; background: var(--stripes); }
+
+/* 全ページ共通のフッター（tools/build.py の FOOTER）: サイト名・ライセンス・ソースコードと、著作権の表示 */
+.foot {
+  padding: 16px var(--gutter-r) calc(18px + env(safe-area-inset-bottom)) var(--gutter-l);
+  border-top: 1px solid var(--rule);
+  text-align: center;
+  font-size: 12px;
+  color: var(--mut);
+}
+.foot ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 0; margin: 0; padding: 0; list-style: none; }
+.foot li { display: flex; align-items: center; }
+/* 区切りの「・」はリンクの外（項目の間）に置く */
+.foot li + li::before { content: "・"; margin: 0 8px; color: var(--mut); }
+/* スマホでは 2 行に折れるので、行の頭に「・」が来ないよう、区切りをやめて間を空ける */
+@media (max-width: 600px) {
+  .foot ul { gap: 6px 22px; }
+  .foot li + li::before { content: none; }
+}
+.foot nav a { display: inline-flex; align-items: center; color: var(--ink); text-decoration: none; }
+.foot nav a:hover { text-decoration: underline; }
+.foot nav .icon { width: 1.15em; height: 1.15em; margin-right: 5px; }
+.foot p { margin: 6px 0 0; font-family: var(--mono); letter-spacing: 0.06em; }
+
+/* 題の帯（作品・ライセンス・404。tools/build.py の whead()）: 地はぶどう色（--grape）。左にロゴと女の子（女の子はロゴの後ろ。
+   押すとトップへ）、右に札（「投稿作品」など）と題名。題名は白い文字に黒の縁取りと影で、ロゴと同じ作り。
+   中身の幅（--content）は作品のページではモニターと本文の列の幅、ほかのページでは文章の幅 */
+.whead-bg { background: var(--grape-bg); isolation: isolate; }
+/* 集中線: 中心を女の子（絵の左から約 71%、上から約 58%）に置いた大きな正方形。帯の外は .whead-bg で切る */
+.burst::before {
+  content: "";
+  position: absolute;
+  left: var(--bx);
+  top: var(--by);
+  width: 300vmax;
+  height: 300vmax;
+  transform: translate(-50%, -50%);
+  background: var(--burst);
+  z-index: -1;
+  pointer-events: none;
+}
+.whead .art { --bx: 71%; --by: 58%; }
+.whead-in {
+  /* 作品のページは --content。文章のページは本文（.doc）の中身の幅（760px − 左右の余白 32px）にそろえる */
+  max-width: var(--content, 728px);
+  --bh: clamp(110px, 11vw, 150px);
+  height: var(--bh);
+  margin: 0 auto;
+  padding: 0 var(--gutter-r) 0 var(--gutter-l);
+  box-sizing: content-box;
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 28px);
+}
+/* 絵（.art）の幅は帯の高さの 2.5 倍。ロゴは左端から（左端は中身の左端にそろう）、女の子はその右に、ロゴの後ろへ少し潜らせて
+   下を帯の下端で切る */
+.whead .art { flex: none; position: relative; height: 100%; width: calc(var(--bh) * 2.5); cursor: pointer; }
+.whead .art img { display: block; position: absolute; width: auto; }
+.whead .art .logo { left: 0; top: 15%; height: 70%; z-index: 1; }
+.whead .art .chara { right: 0; bottom: -8%; height: 100%; }
+.whead-bg { overflow: hidden; container-type: inline-size; }
+/* 絵はトップへのリンク。マウスを乗せる（キーボードで選ぶ）と、ロゴは少し大きく傾いて浮き上がり、女の子は跳ねる。押すと沈む */
+.whead .ttl { position: relative; z-index: 2; }
+.whead .art img { transition: transform 0.18s ease-out, filter 0.18s ease-out; }
+.whead .art .logo { transform-origin: 30% 60%; }
+.whead .art:hover .logo, .whead .art:focus-visible .logo {
+  transform: scale(1.06) rotate(-2.5deg);
+  filter: drop-shadow(3px 4px 0 rgba(17, 17, 17, 0.55));
+}
+.whead .art:hover .chara, .whead .art:focus-visible .chara { transform: translateY(-7%) rotate(2deg); }
+.whead .art:active .logo { transform: scale(1.02) rotate(-1deg); filter: drop-shadow(1px 1px 0 rgba(17, 17, 17, 0.55)); }
+.whead .art:active .chara { transform: translateY(-2%); }
+.whead .art:focus-visible { outline: none; }
+@media (prefers-reduced-motion: reduce) {
+  .whead .art img { transition: none; }
+  .whead .art:hover img, .whead .art:focus-visible img, .whead .art:active img { transform: none; }
+}
+/* 題名は、帯の右の余白（中身の外）まで使ってよい（文章のページは中身が狭く、絵の右に題名が 1 行で入らないため）。
+   余白の幅は、帯の幅（100cqw）と中身の幅の差の半分。画面の端から 32px は空ける */
+.whead .ttl { min-width: 0; margin-right: calc(-1 * clamp(0px, (100cqw - var(--content, 728px)) / 2 - 32px, 320px)); }
+.whead .kind {
+  display: inline-block;
+  padding: 1px 10px;
+  background: var(--ink);
+  color: var(--paper);
+  font: 700 12px var(--ui);
+  letter-spacing: 0.12em;
+}
+.whead h1 {
+  margin: 6px 0 0;
+  font: normal clamp(22px, 3.2vw, 40px)/1.2 var(--disp);
+  color: #fff;
+  -webkit-text-stroke: 2px var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 2px 2px 0 var(--ink), 4px 4px 0 var(--red);
+  transform: skewX(-10deg);
+  transform-origin: left bottom;
+  text-wrap: balance;
+}
+
+/* スマホ: 横並びのまま低くする。女の子は出さず、ロゴを大きめにして、題名に幅を回す */
+@media (max-width: 600px) {
+  .whead-in { --bh: 84px; gap: 10px; }
+  .whead .art { width: calc(var(--bh) * 0.8 * 1516 / 724); }
+  .whead .art .logo { top: 10%; height: 80%; }
+  .whead .art .chara, .whead .art::before { display: none; }
+  .whead .ttl { flex: 1; }
+  .whead .kind { font-size: 10px; padding: 0 6px; }
+  .whead h1 { margin-top: 3px; font-size: clamp(16px, 5vw, 22px); -webkit-text-stroke-width: 1.5px;
+    text-shadow: 1.5px 1.5px 0 var(--ink), 3px 3px 0 var(--red); }
+}
+
+/* 文章のページ（ライセンス・404） */
+.doc {
+  flex: 1;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px var(--gutter-r) 48px var(--gutter-l);
+  font-size: 15px;
+  line-height: 1.8;
+}
+.doc h2 {
+  margin: 32px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 3px solid var(--ink);
+  font-size: 17px;
+}
+.doc p { margin: 8px 0; }
+.doc .note { color: var(--mut); font-size: 13px; }
+/* 謝辞: 雑誌の記事の囲み（黒い線と、ずらした黒い影）に、左上の黒い見出しの札 */
+.doc .thanks { position: relative; margin: 8px 0 36px; padding: 26px 22px 14px; border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink); background: #fff; }
+.doc .thanks h2 { position: absolute; top: -13px; left: 14px; margin: 0; padding: 2px 12px; border: 0; background: var(--ink); color: var(--paper); font-size: 14px; letter-spacing: 0.12em; }
+.doc .thanks p { margin: 0 0 10px; }
+.doc code { font-family: var(--mono); font-size: 0.92em; }

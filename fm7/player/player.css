@@ -1,0 +1,389 @@
+/* 作品のページ（fm7/<作品>/）だけのもの。色・書体・帯・横じま・下の注記は /base.css */
+:root {
+  --btn: rgba(0, 0, 0, 0.06);
+  --btn-on: rgba(0, 0, 0, 0.18);
+  --bezel: clamp(10px, 1.8vw, 22px);
+  --chin: 40px;
+}
+
+/* モニターの幅（--w）は、ページの幅（スクロールバーを除く 100cqw）と、アドレスバーの出入りで変わらない
+   高さ（100svh）から決める。どちらも使えない古いブラウザーは 100vw・100vh */
+html { container-type: inline-size; }
+body {
+  --vw: 100vw;
+  --vh: 100vh;
+}
+@supports (width: 1cqw) and (height: 1svh) {
+  body { --vw: 100cqw; --vh: 100svh; }
+}
+body {
+  /* 画面（640×200 を 16:10。1 ドットは縦長）が、窓の幅にも高さにも収まる大きさ */
+  --w: min(var(--vw) - 32px - 360px - 2 * var(--bezel),
+           (var(--vh) - 150px - 2 * var(--bezel) - var(--chin)) * 1.6,
+           1000px);
+  /* 中身（モニター・間・本文の列）の幅。上の帯の文字もこの幅にそろえる */
+  --content: calc(var(--w) + 2 * var(--bezel) + 40px + 320px);
+}
+
+main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto minmax(220px, 320px);
+  justify-content: center;
+  align-content: start;
+  align-items: start;
+  gap: 24px 40px;
+  padding: 28px var(--gutter-r) 32px var(--gutter-l);
+}
+
+.stage {
+  width: calc(var(--w) + 2 * var(--bezel));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* モニター（大きさは body の --w） */
+.monitor {
+  width: calc(var(--w) + 2 * var(--bezel));
+  padding: var(--bezel) var(--bezel) 0;
+  border-radius: calc(var(--bezel) * 0.8);
+  background: linear-gradient(var(--bz1), var(--bz2));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 18px 36px -18px rgba(0, 0, 0, 0.6);
+}
+
+#screen-wrap {
+  position: relative;
+  width: var(--w);
+  aspect-ratio: 16 / 10;
+  border-radius: calc(var(--bezel) * 0.4 + 2px);
+  overflow: hidden;
+  background: #000;
+  container-type: inline-size;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.6);
+}
+
+canvas#screen, #poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  background: #000;
+}
+
+/* 起動前は、作品の画面を暗くして見せる */
+#poster {
+  position: absolute;
+  inset: 0;
+  filter: brightness(0.3) saturate(0.55);
+}
+body.powered #poster { display: none; }
+
+/* ボタンの中心は、モニター全体（上の縁・画面・下の帯）の中心に置く。画面の中心より（帯 − 上の縁）の半分だけ下 */
+#start {
+  --size: clamp(64px, 13cqi, 112px);
+  --cy: calc(50% + (var(--chin) - var(--bezel)) / 2);
+  position: absolute;
+  inset: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+#start[hidden] { display: none; }
+/* 青い丸と外側の輪に、角の丸い白い三角。ホバーで三角が右へ寄り、丸が明るくなる。
+   ふだんの動きはボタンの data-anim で選ぶ: shake（左右に震える）/ ripple（波紋） */
+#start .go {
+  position: absolute;
+  left: 50%;
+  top: var(--cy);
+  width: var(--size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+}
+#start .go svg { position: relative; display: block; width: 100%; height: 100%; overflow: visible; }
+#start .go .ring { fill: none; stroke: var(--blue); stroke-width: 3; }
+#start .go .disc { fill: var(--blue); transition: fill 0.2s; }
+#start .go .tri {
+  fill: #fff;
+  stroke: #fff;
+  stroke-width: 6;
+  stroke-linejoin: round;
+  transition: transform 0.2s;
+}
+#start[data-anim="ripple"] .go::before, #start[data-anim="ripple"] .go::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--blue);
+  opacity: 0;
+  animation: ripple 5.4s ease-out infinite;
+}
+/* ふだんは波紋 1 つ。2.4 秒で広がり（周期 5.4 秒の 44.4%）、3 秒ためてから次を広げる */
+#start[data-anim="ripple"] .go::after { animation: none; }
+@keyframes ripple {
+  0% { transform: scale(1); opacity: 0.9; }
+  44.4%, 100% { transform: scale(1.8); opacity: 0; }
+}
+/* ホバーでは、ためを入れずに 2 つの波紋を続けて出す */
+@keyframes ripple-fast {
+  from { transform: scale(1); opacity: 0.9; }
+  to { transform: scale(1.8); opacity: 0; }
+}
+#start[data-anim="ripple"]:is(:hover, :focus-visible) .go::before,
+#start[data-anim="ripple"]:is(:hover, :focus-visible) .go::after { animation: ripple-fast 1.2s ease-out infinite; }
+#start[data-anim="ripple"]:is(:hover, :focus-visible) .go::after { animation-delay: 0.6s; }
+/* 震える: 0.5 秒（周期 3.5 秒の 14%）でだんだん小さく左右に揺れ、3 秒ためる。ホバー中は揺らさない */
+#start[data-anim="shake"] .go { animation: shake 3.5s ease-in-out 1s infinite; }
+#start[data-anim="shake"]:is(:hover, :focus-visible) .go { animation: none; }
+@keyframes shake {
+  0%, 14%, 100% { transform: translateX(0); }
+  2% { transform: translateX(-3px); }
+  4% { transform: translateX(3px); }
+  6% { transform: translateX(-2px); }
+  8% { transform: translateX(2px); }
+  10% { transform: translateX(-1px); }
+  12% { transform: translateX(1px); }
+}
+#start:hover .go .tri, #start:focus-visible .go .tri { transform: translateX(3px); }
+#start:hover .go .disc, #start:focus-visible .go .disc { fill: var(--blue-hi); }
+#start:focus-visible .go { outline: 2px solid #fff; outline-offset: 8px; }
+#start .hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--cy) + var(--size) / 2 + clamp(22px, 5cqi, 44px));
+  text-align: center;
+  font: 500 clamp(14px, 2.2cqi, 19px) var(--round);
+  letter-spacing: 0.06em;
+  color: #c8c8c8;
+  text-shadow: 0 1px 2px #000;
+  transition: color 0.2s;
+}
+#start:hover .hint, #start:focus-visible .hint { color: #fff; }
+
+#message {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 14px var(--mono);
+  color: #ccc;
+  pointer-events: none;
+}
+#message:empty { display: none; }
+
+/* モニターの下の帯: 機種と、ドライブ 1・ドライブ 0・電源のランプ（本体の前面と同じ並び） */
+.chin {
+  height: var(--chin);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font: 700 11px var(--mono);
+  letter-spacing: 0.14em;
+  color: var(--bzink);
+}
+.lamps { display: flex; align-items: center; gap: 18px; }
+.lamps > span { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.lamp {
+  width: 16px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--lamp-off);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.6);
+}
+.lamp.lit { background: var(--lamp-drv); box-shadow: 0 0 6px var(--lamp-drv); }
+body.powered .lamp.pwr { background: var(--lamp-pwr); box-shadow: 0 0 6px var(--lamp-pwr); }
+.drive b {
+  display: inline-grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  background: #000;
+  color: #eee;
+  font: 700 11px var(--ui);
+  letter-spacing: 0;
+  box-shadow: 0 0 0 1px #3a3a3e;
+}
+
+/* 画面写真: 雑誌の紙面のように、白いふちと影を付け、下に番号と解説 */
+.shots {
+  width: min(100%, 680px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 22px;
+}
+.shots figure { margin: 0; min-width: 0; }
+.shots img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+  background: #000;
+  border: 5px solid #fff;
+  box-shadow: 0 0 0 1px var(--rule), 3px 4px 10px -4px rgba(0, 0, 0, 0.45);
+}
+.shots figcaption { margin-top: 8px; font-size: 13px; line-height: 1.7; color: var(--ink); }
+.shots figcaption b { margin-right: 4px; color: var(--red); }
+
+/* 仕様の表 */
+.spec { min-width: 0; padding-top: 4px; }
+/* キャッチコピー: 太い丸ゴシック（Mochiy Pop One）の斜体に、帯と同じ黄色の蛍光ペンの下線 */
+.spec .catch {
+  margin: 0 0 14px;
+  font: normal clamp(20px, 2vw, 24px)/1.5 var(--pop);
+  transform: skewX(-8deg);
+  transform-origin: left bottom;
+}
+.spec .catch span {
+  background: linear-gradient(transparent 62%, #ffe14d 62%, #ffe14d 92%, transparent 92%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+/* 作者よりひとこと: 雑誌の記事の囲み */
+.spec .comment {
+  position: relative;
+  margin: 0 0 22px;
+  padding: 18px 14px 12px;
+  border: 2px solid var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.spec .comment h2 {
+  position: absolute;
+  top: -11px;
+  left: 10px;
+  margin: 0;
+  padding: 1px 8px;
+  background: var(--ink);
+  color: var(--paper);
+  font: 700 12px var(--ui);
+  letter-spacing: 0.08em;
+}
+.spec .comment p { margin: 0; font-size: 14px; line-height: 1.8; }
+.spec dd s { color: var(--mut); text-decoration-thickness: 2px; text-decoration-color: var(--red); }
+.spec .lead { margin: 0 0 18px; font-size: 15px; line-height: 1.9; text-align: justify; }
+.spec dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 8.5em 1fr;
+  border-top: 3px solid var(--ink);
+  font-size: 14px;
+}
+.spec dt, .spec dd { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--rule); }
+.spec dt { color: var(--mut); white-space: nowrap; padding-right: 12px; }
+.spec dd { font-family: var(--mono); font-weight: 700; }
+.spec h2 {
+  margin: 28px 0 0;
+  font: 700 12px var(--mono);
+  letter-spacing: 0.2em;
+  color: var(--mut);
+}
+.spec h2 + dl { margin-top: 6px; border-top-width: 1px; font-size: 13px; grid-template-columns: calc(8.5em * 14 / 13) 1fr; }
+.spec .env dd { font-family: var(--ui); }
+.spec .env a { text-decoration: none; border-bottom: 1px solid var(--rule); }
+.spec .env a:hover { border-bottom-color: var(--ink); }
+.spec dd small { display: block; font: 400 12px var(--mono); color: var(--mut); }
+.spec .note { margin: 10px 0 0; font-size: 12px; color: var(--mut); }
+.spec .note a { color: inherit; white-space: nowrap; }
+
+/* タッチのボタン（指で触れる端末だけ） */
+#touch {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+#touch[hidden] { display: none; }
+#touch button {
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: var(--btn);
+  color: var(--ink);
+  font: 700 20px var(--mono);
+  box-shadow: 0 3px 0 var(--ink);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#touch button.on { background: var(--btn-on); transform: translateY(3px); box-shadow: none; }
+
+#dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  grid-template-rows: repeat(3, 60px);
+  gap: 4px;
+}
+#dpad .up    { grid-area: 1 / 2; }
+#dpad .left  { grid-area: 2 / 1; }
+#dpad .right { grid-area: 2 / 3; }
+#dpad .down  { grid-area: 3 / 2; }
+
+#buttons { display: flex; gap: 16px; }
+#buttons button { width: 76px; height: 76px; border-radius: 50%; }
+
+/* 狭い窓: 仕様の表をモニターの下に */
+@media (max-width: 900px) {
+  main { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  body {
+    --w: min(var(--vw) - 32px - 2 * var(--bezel), (var(--vh) - 150px - 2 * var(--bezel) - var(--chin)) * 1.6);
+    --content: calc(var(--w) + 2 * var(--bezel));
+  }
+  .spec { width: 100%; max-width: 640px; }
+}
+@media (max-width: 600px) {
+  :root { --bezel: 8px; --chin: 32px; }
+  body { --w: calc(var(--vw) - 32px - 2 * var(--bezel)); }
+  .chin { font-size: 9px; }
+  #start .hint { display: none; }
+  .lamps { gap: 10px; }
+  .lamp { width: 12px; height: 5px; }
+  .drive b { width: 13px; height: 13px; font-size: 10px; }
+  .shots { gap: 12px 12px; }
+  .shots img { border-width: 3px; }
+  .shots figcaption { font-size: 11.5px; line-height: 1.6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #start .go, #start .go::before, #start .go::after { animation: none !important; }
+  #start .go::before, #start .go::after { opacity: 0; }
+  #start .go .tri, #start .go .disc { transition: none; }
+}
+
+/* 本文の最後の「投稿作品の一覧へ」。遊び終えた人が次の作品を探しに行けるように。黒い枠とずらした影のボタン（トップの囲みと同じ作り） */
+.back { margin: 28px 0 0; }
+.back a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px 8px 14px;
+  border: 2px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  background: #fff;
+  color: var(--ink);
+  font: 700 15px/1.4 var(--ui);
+  text-decoration: none;
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+}
+.back svg { width: 10px; height: 12px; color: var(--blue); }
+.back a:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.back a:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.back a:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .back a { transition: none; } }

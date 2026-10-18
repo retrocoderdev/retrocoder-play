@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="352">
+<!-- ヘッダーの地の模様: 投稿作品（4096 色ポリゴンデモ）のディスクの中身を 16 進で並べたもの。base.css で並べて敷く -->
+<g font-family="Menlo, Consolas, monospace" font-size="14" fill="#fff" fill-opacity=".085">
+<text x="12" y="18">0000  00 A0 00 00 00 1A 50 10</text>
+<text x="12" y="40">0008  CE 40 00 B7 FD 0F 8E 43</text>
+<text x="12" y="62">0010  61 CE 01 D1 A6 80 A7 C0</text>
+<text x="12" y="84">0018  11 83 01 E3 25 F6 CE FF</text>
+<text x="12" y="106">0020  00 00 03 01 10 00 00 00</text>
+<text x="12" y="128">0028  00 00 00 00 00 00 00 01</text>
+<text x="12" y="150">0030  F2 EC 81 ED C1 11 83 FF</text>
+<text x="12" y="172">0038  FE 25 F6 17 0D 4F 86 04</text>
+<text x="12" y="194">0040  B7 FD 02 B6 FD 03 1C EF</text>
+<text x="12" y="216">0048  10 8E C0 00 17 0D 9E 10</text>
+<text x="12" y="238">0050  8E C0 03 17 0D 97 17 00</text>
+<text x="12" y="260">0058  A7 C6 1F 8E 65 E7 17 00</text>
+<text x="12" y="282">0060  B1 4F 17 00 73 86 40 B7</text>
+<text x="12" y="304">0068  FD 12 8E 6A C6 8E 80 00</text>
+<text x="12" y="326">0070  10 8E 4F 0A 6F 84 A6 A0</text>
+<text x="12" y="348">0078  A7 01 30 88 10 8C 80 40</text>
+<text x="332" y="18">0080  25 F2 17 03 24 FC 40 14</text>
+<text x="332" y="40">0088  FD 40 16 17 03 5C 17 04</text>
+<text x="332" y="62">0090  61 17 03 2C 17 00 AB 17</text>
+<text x="332" y="84">0098  0D 8E 17 00 28 17 01 1C</text>
+<text x="332" y="106">00A0  17 01 5F 17 0C A3 B6 40</text>
+<text x="332" y="128">00A8  E0 B1 40 E1 24 03 B7 40</text>
+<text x="332" y="150">00B0  E1 B6 40 1A 88 01 B7 40</text>
+<text x="332" y="172">00B8  1A FC 40 12 C3 00 01 FD</text>
+<text x="332" y="194">00C0  40 12 16 FF C6 B6 FD 12</text>
+<text x="332" y="216">00C8  85 01 26 F9 B6 FD 12 85</text>
+<text x="332" y="238">00D0  01 27 F9 B6 40 1A 88 01</text>
+<text x="332" y="260">00D8  CE 68 46 4D 27 03 CE 69</text>
+<text x="332" y="282">00E0  86 31 C9 01 40 34 29 1A</text>
+<text x="332" y="304">00E8  50 86 FD 1F 8B 37 16 97</text>
+<text x="332" y="326">00F0  30 D7 31 9F 32 37 02 97</text>
+<text x="332" y="348">00F8  34 11 A3 62 26 EF 35 A9</text>
+</g>
+</svg>

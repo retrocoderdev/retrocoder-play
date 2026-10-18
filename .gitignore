@@ -1,0 +1,7 @@
+# ビルドの生成物（tools/build.py）
+dist/
+.DS_Store
+__pycache__/
+
+# ヘッダーの絵の元の PNG（大きいので入れない。公開する絵は site/img/ に変換したもの）
+art/
