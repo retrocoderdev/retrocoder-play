@@ -29,10 +29,22 @@ FONTS = ('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy
 # 1200×630 の紙面に共通の CSS（色は site/base.css と同じ）
 CSS = '''
 * { box-sizing: border-box; }
+html { --grape-bg: url(HEXDUMP) 0 0 / 640px 352px, #3b1d63; }
 html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #fbfbf8; color: #111;
   font-family: "Zen Kaku Gothic New", sans-serif; }
-.band { background: #0a0a0a; color: #fff; }
-.site { font: 700 18px "M PLUS 1 Code", monospace; letter-spacing: .2em; color: #aaa; }
+.band { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center; gap: 24px;
+  height: 150px; padding: 0 48px; background: var(--grape-bg); }
+.burst { position: absolute; left: var(--bx); top: var(--by); width: 3000px; height: 3000px; transform: translate(-50%, -50%);
+  z-index: -1; background: repeating-conic-gradient(rgba(255,255,255,.075) 0 5deg, transparent 5deg 12deg); }
+.art { flex: none; position: relative; width: 375px; height: 100%; }
+.art img { position: absolute; display: block; width: auto; }
+.art .logo { left: 0; top: 15%; height: 70%; z-index: 1; }
+.art .chara { right: 0; bottom: -8%; height: 100%; }
+.kind { display: inline-block; padding: 1px 12px; background: #111; color: #fbfbf8; font: 700 16px "Zen Kaku Gothic New", sans-serif;
+  letter-spacing: .12em; }
+.ttl h1 { margin: 8px 0 0; font: normal 40px/1.2 "Dela Gothic One", sans-serif; color: #fff; -webkit-text-stroke: 3px #111;
+  paint-order: stroke fill; text-shadow: 3px 3px 0 #111, 6px 6px 0 #d7261e; transform: skewX(-10deg); transform-origin: left bottom;
+  text-wrap: balance; }
 .stripes { height: 20px; background: linear-gradient(#ffe14d 0 22%, transparent 22% 33%, #ffae1f 33% 55%,
   transparent 55% 66%, #f26b1d 66% 82%, transparent 82% 88%, #d7261e 88%); }
 .mon { padding: 12px 12px 0; border-radius: 12px; background: linear-gradient(#2c2c30, #151517);
@@ -62,15 +74,19 @@ def monitor(img, w, h, label=''):
 
 
 def work_page(w, thumb):
+    """作品: 上にサイトの題の帯（ぶどう色の地にダンプと集中線、ロゴと女の子、「投稿作品」と題名）、下にモニターに入れた
+    サムネイル（thumb.png）と、機種の札とキャッチコピー"""
     e = html.escape
     label = 'FM77AV40' if w.get('av40') else 'FM77AV'
     catch = e(w.get('catch', '')).replace('\n', '<br>')
-    return f'''<div class="band" style="padding:30px 48px 0">
-  <div class="site" style="font-family:'Mochiy Pop One',sans-serif;letter-spacing:.08em">プレイ！レトロPC！</div>
-  <div class="disp" style="font-size:50px;line-height:1.25;margin-top:6px;padding-bottom:22px">{e(w["title"])}</div>
+    img = ROOT / 'site/img'
+    return f'''<div class="band" style="--bx:315px;--by:87px">
+  <div class="burst"></div>
+  <div class="art"><img class="chara" src="{(img / 'header_chara_1200.avif').as_uri()}"><img class="logo" src="{(img / 'header_logo_1280.avif').as_uri()}"></div>
+  <div class="ttl"><span class="kind">投稿作品</span><h1>{e(w["title"])}</h1></div>
 </div>
 <div class="stripes"></div>
-<div style="display:flex;gap:44px;align-items:center;padding:28px 48px">
+<div style="display:flex;gap:44px;align-items:center;padding:29px 48px">
   {monitor(thumb, 576, 360, label)}
   <div style="flex:1;min-width:0">
     <span class="badge">{label}</span>
@@ -92,14 +108,18 @@ def top_page(thumbs):
   <img src="{logo.as_uri()}" style="position:absolute;left:-112px;top:104px;height:310px">
 </div>
 <div class="stripes"></div>
-<div style="height:90px;display:grid;place-items:center;font-size:30px;font-weight:700;color:#111">
-  レトロ PC の作品を、ブラウザーでそのまま遊べます。</div>'''
+<div style="height:90px;display:grid;place-items:center;font-size:28px;font-weight:700;color:#111">
+  1980 年代のパソコン向けのオリジナル作品を、ブラウザーでそのまま遊べます。</div>'''
+
+
+def page_css():
+    return CSS.replace('HEXDUMP', (ROOT / 'site/img/hexdump.svg').as_uri())
 
 
 def shoot(body, out):
     """out が .jpg なら、撮った PNG を JPEG（品質 82）に直す"""
     page = (f'<!doctype html><html lang="ja"><head><meta charset="utf-8">'
-            f'<link rel="stylesheet" href="{FONTS}"><style>{CSS}</style></head><body>{body}</body></html>')
+            f'<link rel="stylesheet" href="{FONTS}"><style>{page_css()}</style></head><body>{body}</body></html>')
     with tempfile.TemporaryDirectory() as tmp:
         src = Path(tmp) / 'og.html'
         src.write_text(page)
