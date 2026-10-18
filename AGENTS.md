@@ -4,7 +4,7 @@
 
 ## 決まり
 
-- **push しない**。人が中身とコミットの履歴を確かめて、履歴を書き直してから公開する（このリポジトリは public になる）。秘密の情報、手元のパス、private なリポジトリの名前を書かない
+- **push は人に言われたときだけ**。コミットも、中身を人に見せてから行う。リポジトリを public に切り替えるのは人が決める（このリポジトリは public になる）。秘密の情報、手元のパス、private なリポジトリの名前を書かない
 - 人とのやりとりと文書は日本語
 - 公開の前に、デザインを人と試行錯誤する。`play.retrocoder.dev` に置くのはその後
 
@@ -31,13 +31,21 @@ python3 tools/build.py --serve     # http://localhost:8078/fm7/<作品>/
 - ページの `<head>`（title・description・canonical・OGP・アイコン・フォント・`/base.css`）は `build.py` の `head()` が `{{head}}` に入れる。`sitemap.xml` も `build.py` が作る
 - トップとタグごとの一覧ページ（`/tags/<名前>/`。JavaScript を使わない静的なページ）は、`site/index.html` をひな形に `build.py` が作る
 - 全ページ共通のフッター（サイト名・ライセンス・ソースコードと、著作権の表示）は `build.py` の `FOOTER` が `{{footer}}` に入れる
-- 404 のページは `dist/404.html`。Cloudflare Workers で公開するときは、見つからない URL でこれを返す設定にする
+- 404 のページは `dist/404.html`。Cloudflare Workers で公開するときは、見つからない URL でこれを返す設定にする（下の「公開」）
 - 作品を足すときは `fm7/works/<作品>/` に `work.json` と `disk.d77` を置く。名前は英小文字・数字・`-`。URL は `/fm7/<作品>/`
 - プレイヤーは、作品のページに埋め込んだ設定（`<script id="work">`）を読み、隣の `disk.d77` だけを読み込む
 - 表示する機種名は `FM77AV`。AV40 だけの機能を使う作品（`"av40": true`）だけ `FM77AV40` と書く。仕様の表では「対応機種」として「FM77AV 以降」と出す
-- 仕様の表の並び: 対応機種 → `specs`（画面モード・媒体・操作方法など）→ 作者 → 公開日
+- 仕様の表の並び: 対応機種 → `specs`（画面モード・媒体・操作方法など）→ 作者 → 公開日 → ライセンス
 - モニターの下のランプは本体の前面と同じ並び（左からドライブ 1・ドライブ 0・電源）。ドライブのランプは、コアの `fdc.accessLatch` を毎フレーム読んで点ける（コアは変えない）
 - `&debug`（`?debug`）で、届いたキーとコアのキーボードの状態を左上に出す。`?autostart` はクリックなしで起動（確かめる用。音は出ない）
+
+## 公開（Cloudflare Workers）
+
+- Cloudflare の操作には **cf CLI**（`cf`。Cloudflare の公式の CLI）を使う。wrangler は使わない
+- `tools/build.py` で作った `dist/` を、Workers の静的なアセットとして配る。設定は `cloudflare.config.ts`（`cf` が読む）
+- 手元で確かめる: `cf dev`。配る: `cf deploy`（先に `cf deploy --dry-run`）。デプロイは人に確かめてから行う
+- ログインは人が行う（`cf auth login`。ブラウザーを開くため）
+- コマンドの探し方: `cf cli search "<したいこと>"` で探し、見つけたコマンドの `--help` を読む。説明書は `cf docs search "<質問>"`。どちらの検索にも、ドメイン・アカウントの ID・名前などを入れない（したいことと、リソースの種類だけを書く）
 
 ## ライセンス
 
