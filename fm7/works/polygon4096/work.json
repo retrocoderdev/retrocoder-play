@@ -10,6 +10,7 @@
   "boot": "basic",
   "published": "2026-10-18",
   "published_strike": "1985",
+  "license": "無断転載・再配布禁止",
   "shots": [
     {"file": "shot1.png", "caption": "目の前をかすめる正二十面体！光の当たる面ほど明るく塗り分けられているのだ。"},
     {"file": "shot2.png", "caption": "弾んで止まったロゴに、光の帯が走るぞ。立体はロゴの後ろをすり抜けていく！"}

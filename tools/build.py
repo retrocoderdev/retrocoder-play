@@ -156,7 +156,7 @@ def build_fm7():
         # 表示する機種名。AV40 だけの機能を使う作品（"av40": true）だけ FM77AV40 と書く
         label = 'FM77AV40' if w.get('av40') else 'FM77AV'
         e = html.escape
-        # 表の値は HTML（spec_row はエスケープしない）。並びは 対応機種 → specs → 作者 → 公開日
+        # 表の値は HTML（spec_row はエスケープしない）。並びは 対応機種 → specs → 作者 → 公開日 → ライセンス
         specs = [('対応機種', f'{label} 以降')] + [(r[0], e(r[1]), *r[2:]) for r in w.get('specs', [])]
         if w.get('author'):
             specs.append(('作者', e(w['author'])))
@@ -167,6 +167,9 @@ def build_fm7():
                 sys.exit(f'{name}: published は YYYY-MM-DD')
             strike = f'<s>{e(w["published_strike"])}</s> ' if w.get('published_strike') else ''
             specs.append(('公開日', strike + w['published'].replace('-', '.')))
+        # 作品のライセンス（作品の権利は作者のもので、サイトの MIT License とは別）。"無断転載・再配布禁止"、"CC BY 4.0" など
+        if w.get('license'):
+            specs.append(('ライセンス', e(w['license'])))
         if w.get('boot', 'basic') not in BOOTS:
             sys.exit(f'{name}: boot は {BOOTS} のどれか')
         pub = {k: w[k] for k in ('title', 'machine', 'boot', 'touch') if k in w}
