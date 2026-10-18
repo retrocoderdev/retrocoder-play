@@ -5,8 +5,10 @@
 - FM-7 / FM77AV: [WebM7](https://github.com/7032JP/WebM7) と互換 ROM [7032 Alternative ROMs](https://github.com/7032JP/7032AltROMs) で動かしています。純正 ROM は使っていません
 
 ```
-python3 tools/build.py --serve
+python3 tools/build.py --serve     # dist/ を作り、http://localhost:8078/ で開く
 ```
+
+公開は Cloudflare Workers に、[cf CLI](https://developers.cloudflare.com/cf/) で行います（`npm install` のあと、`python3 tools/build.py && cf deploy`）。
 
 ## ライセンス
 

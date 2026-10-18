@@ -5,3 +5,10 @@ __pycache__/
 
 # ヘッダーの絵の元の PNG（大きいので入れない。公開する絵は site/img/ に変換したもの）
 art/
+
+# Cloudflare（cf CLI と、cf が中で使う Wrangler）
+node_modules/
+.cloudflare/
+.wrangler/
+.dev.vars*
+.env*

@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "cf CLI が Cloudflare Workers へ配るときに使う道具（Wrangler）。サイト自体は tools/build.py で作る",
+  "devDependencies": {
+    "cf": "1.0.0-beta.18",
+    "wrangler": "4.147.0"
+  }
+}

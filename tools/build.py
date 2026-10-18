@@ -46,7 +46,7 @@ GITHUB_ICON = ('<svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path f
                '.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>')
 # 全ページ共通のフッター（{{footer}}）
 FOOTER = f'''<footer class="foot">
-  <nav aria-label="サイト"><ul><li><a href="/">{SITE_NAME}</a></li><li><a href="/#works">投稿作品</a></li><li><a href="/#notes">技術解説</a></li><li><a href="/fm7/credits.html">ライセンス</a></li><li><a href="{SOURCE}">{GITHUB_ICON}ソースコード</a></li></ul></nav>
+  <nav aria-label="サイト"><ul><li><a href="/">{SITE_NAME}</a></li><li><a href="/#works">投稿作品</a></li><li><a href="/#notes">技術解説</a></li><li><a href="/fm7/credits/">ライセンス</a></li><li><a href="{SOURCE}">{GITHUB_ICON}ソースコード</a></li></ul></nav>
   <p>© 2026 retrocoder</p>
 </footer>'''
 
@@ -135,8 +135,12 @@ def build_fm7():
     out = DIST / 'fm7'
     out.mkdir()
     player = ROOT / 'fm7/player'
-    for name in ('player.js', 'player.css', 'credits.html'):
+    for name in ('player.js', 'player.css'):
         shutil.copy2(player / name, out / name)
+    # ライセンスのページは /fm7/credits/（フォルダーの index.html）。Workers は credits.html を /fm7/credits へ転送するので、
+    # 手元のサーバーと本番で同じ URL になる形にする
+    (out / 'credits').mkdir()
+    shutil.copy2(player / 'credits.html', out / 'credits/index.html')
     shutil.copytree(ROOT / 'vendor/webm7', out / 'webm7')
     template = (player / 'work.html').read_text()
     # 動作環境に出す版。WebM7 は VERSION の日付、互換 ROM は README の版
@@ -298,10 +302,10 @@ def main():
     shutil.copytree(ROOT / 'site', DIST)
     works = build_fm7()
     lists = build_lists(works)
-    fill_head('/fm7/credits.html', title=f'ライセンスについて - {SITE_NAME}', og_title='ライセンスについて',
+    fill_head('/fm7/credits/', title=f'ライセンスについて - {SITE_NAME}', og_title='ライセンスについて',
               description='FM-7 / FM77AV の作品のプレイヤーが使っているソフトウェアと素材のライセンス。')
     fill_head('/404.html', title=f'ページが見つかりません - {SITE_NAME}', description='', index=False)
-    for page, kind, title in (('fm7/credits.html', 'ご案内', 'ライセンスについて'), ('404.html', 'お知らせ', 'ページが見つかりません')):
+    for page, kind, title in (('fm7/credits/index.html', 'ご案内', 'ライセンスについて'), ('404.html', 'お知らせ', 'ページが見つかりません')):
         f = DIST / page
         f.write_text(f.read_text().replace('{{whead}}', whead(kind, title)))
     # CSS と JS の URL に、中身から作った版（?v=…）を付ける。中身を変えたら URL も変わり、ブラウザーや CDN に
@@ -315,7 +319,7 @@ def main():
         page.write_text(text)
         if '{{' in page.read_text():
             sys.exit(f'{page.relative_to(DIST)}: 埋めていない {{{{…}}}} が残っている')
-    urls = lists + [w['path'] for w in works] + ['/fm7/credits.html']
+    urls = lists + [w['path'] for w in works] + ['/fm7/credits/']
     (DIST / 'sitemap.xml').write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         + ''.join(f'  <url><loc>{ORIGIN}{u}</loc></url>\n' for u in urls) + '</urlset>\n')
