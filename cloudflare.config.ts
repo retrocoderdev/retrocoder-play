@@ -12,5 +12,8 @@ export default defineConfig({
     },
     // 公開する場所（retrocoder.dev のゾーンに、このホスト名の DNS レコードと証明書が自動で作られる）
     domains: ["play.retrocoder.dev"],
+    // <名前>.<サブドメイン>.workers.dev と、版ごとのプレビューの URL では見せない（公開するのは上のドメインだけ）
+    workersDev: false,
+    previewUrls: false,
   },
 });
