@@ -171,9 +171,11 @@ def build_fm7():
                 sys.exit(f'{name}: published は YYYY-MM-DD')
             strike = f'<s>{e(w["published_strike"])}</s> ' if w.get('published_strike') else ''
             specs.append(('公開日', strike + w['published'].replace('-', '.')))
-        # 作品のライセンス（作品の権利は作者のもので、サイトの MIT License とは別）。"無断転載・再配布禁止"、"CC BY 4.0" など
+        # 作品のライセンス（作品の権利は作者のもので、サイトの MIT License とは別）。"MIT License"、"無断転載・再配布禁止" など。
+        # 条文 LICENSE.txt を作品のフォルダーに置くと、表の値をそこへのリンクにする
+        license_txt = (work / 'LICENSE.txt').exists()
         if w.get('license'):
-            specs.append(('ライセンス', e(w['license'])))
+            specs.append(('ライセンス', f'<a href="LICENSE.txt">{e(w["license"])}</a>' if license_txt else e(w['license'])))
         if w.get('boot', 'basic') not in BOOTS:
             sys.exit(f'{name}: boot は {BOOTS} のどれか')
         pub = {k: w[k] for k in ('title', 'machine', 'boot', 'touch') if k in w}
@@ -209,6 +211,8 @@ def build_fm7():
                 .replace('{{work_json}}', work_json))
         (out / name / 'index.html').write_text(page)
         shutil.copy2(work / 'disk.d77', out / name / 'disk.d77')
+        if license_txt:
+            shutil.copy2(work / 'LICENSE.txt', out / name / 'LICENSE.txt')
         for shot in w.get('shots', []):
             shutil.copy2(work / shot['file'], out / name / shot['file'])
         tags = [label] + w.get('tags', [])
