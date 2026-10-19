@@ -33,7 +33,7 @@ MACHINES = ('fm77av40', 'fm77av')
 BOOTS = ('basic', 'dos')
 # タグと、その一覧ページの URL の名前（/tags/<名前>/）。work.json の tags に新しいタグを書くときは、ここに足す。
 # 機種のタグ（FM77AV / FM77AV40）は自動で付く
-TAG_SLUGS = {'FM77AV': 'fm77av', 'FM77AV40': 'fm77av40', 'デモ': 'demo', 'ゲーム': 'game'}
+TAG_SLUGS = {'FM77AV': 'fm77av', 'FM77AV40': 'fm77av40', 'デモ': 'demo', 'ゲーム': 'game', 'CG': 'cg'}
 
 
 SOURCE = 'https://github.com/retrocoderdev/retrocoder-play'
@@ -165,11 +165,11 @@ def build_fm7():
         if w.get('author'):
             specs.append(('作者', e(w['author'])))
         # 公開日（発売日の代わり）。"2026-10-18" と書き、表には 2026.10.18 と出す。published_strike を書くと、
-        # その年を取り消し線で前に置く（当時の発売日に見せかけた冗談）
+        # その年を取り消し線で前に置く（当時の発売日に見せかけた冗談。間は空けず <s>2026</s>1985.10.20 のように出す）
         if 'published' in w:
             if not re.match(r'^\d{4}-\d{2}-\d{2}$', w['published']):
                 sys.exit(f'{name}: published は YYYY-MM-DD')
-            strike = f'<s>{e(w["published_strike"])}</s> ' if w.get('published_strike') else ''
+            strike = f'<s>{e(w["published_strike"])}</s>' if w.get('published_strike') else ''
             specs.append(('公開日', strike + w['published'].replace('-', '.')))
         # 作品のライセンス（作品の権利は作者のもので、サイトの MIT License とは別）。"MIT License"、"無断転載・再配布禁止" など。
         # 条文 LICENSE.txt を作品のフォルダーに置くと、表の値をそこへのリンクにする
