@@ -1,4 +1,8 @@
 /* 作品のページ（fm7/<作品>/）だけのもの。色・書体・帯・横じま・下の注記は /base.css */
+/* 読む順に関係なく、base（サイト共通）の上に page（ページ固有）を重ねる。Astro は CSS を束ねて、読む順を入れ替えることがある */
+@layer base, page;
+
+@layer page {
 :root {
   --btn: rgba(0, 0, 0, 0.06);
   --btn-on: rgba(0, 0, 0, 0.18);
@@ -387,3 +391,4 @@ body.powered .lamp.pwr { background: var(--lamp-pwr); box-shadow: 0 0 6px var(--
 .back a:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 .back a:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .back a { transition: none; } }
+} /* @layer page */

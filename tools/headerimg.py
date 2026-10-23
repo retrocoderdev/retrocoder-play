@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ヘッダーの絵（art/ の元の PNG）から、公開する site/img/header_* を作る。元の絵を変えたときに回す。
+"""ヘッダーの絵（art/ の元の PNG）から、公開する public/img/header_* を作る。元の絵を変えたときに回す。
 
     python3 tools/headerimg.py      # Pillow 11.3 以降（AVIF を書ける版）が要る: pip install pillow
 
@@ -18,7 +18,7 @@ except ImportError:
     sys.exit('Pillow が要る（pip install pillow）')
 
 ROOT = Path(__file__).resolve().parents[1]
-ART, OUT = ROOT / 'art', ROOT / 'site/img'
+ART, OUT = ROOT / 'art', ROOT / 'public/img'
 # 透明な縁を切る範囲（左, 上, 右, 下）。絵の中身が収まる箱を測って、数ドット余裕をとったもの
 CROP = {'logo': (352, 0, 1868, 724), 'chara': (8, 77, 1443, 1071)}
 
@@ -29,7 +29,7 @@ def resize(im, w):
 
 def save(im, name, **opts):
     im.save(OUT / name, **opts)
-    print(f'site/img/{name}  {(OUT / name).stat().st_size // 1024} KB')
+    print(f'public/img/{name}  {(OUT / name).stat().st_size // 1024} KB')
 
 
 def main():

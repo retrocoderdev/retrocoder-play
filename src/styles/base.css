@@ -1,5 +1,9 @@
 /* サイト全体で共通のもの: 80 年代のパソコンのカタログの紙面（白い紙、黒い題の帯と横じま）。
    トップ（index.html）・作品のページ（fm7/player.css と一緒に）・ライセンス・404 が読む */
+/* 読む順に関係なく、base（サイト共通）の上に page（ページ固有）を重ねる。Astro は CSS を束ねて、読む順を入れ替えることがある */
+@layer base, page;
+
+@layer base {
 :root {
   --paper: #fbfbf8;
   --ink: #111;
@@ -64,7 +68,7 @@ a { color: inherit; }
 /* 黄・橙・赤の横じま */
 .stripes { height: 14px; background: var(--stripes); }
 
-/* 全ページ共通のフッター（tools/build.py の FOOTER）: サイト名・ライセンス・ソースコードと、著作権の表示 */
+/* 全ページ共通のフッター（components/Footer.astro）: サイト名・ライセンス・ソースコードと、著作権の表示 */
 .foot {
   padding: 16px var(--gutter-r) calc(18px + env(safe-area-inset-bottom)) var(--gutter-l);
   border-top: 1px solid var(--rule);
@@ -86,7 +90,7 @@ a { color: inherit; }
 .foot nav .icon { width: 1.15em; height: 1.15em; margin-right: 5px; }
 .foot p { margin: 6px 0 0; font-family: var(--mono); letter-spacing: 0.06em; }
 
-/* 題の帯（作品・ライセンス・404。tools/build.py の whead()）: 地はぶどう色（--grape）。左にロゴと女の子（女の子はロゴの後ろ。
+/* 題の帯（作品・ライセンス・404。components/WHead.astro）: 地はぶどう色（--grape）。左にロゴと女の子（女の子はロゴの後ろ。
    押すとトップへ）、右に札（「投稿作品」など）と題名。題名は白い文字に黒の縁取りと影で、ロゴと同じ作り。
    中身の幅（--content）は作品のページではモニターと本文の列の幅、ほかのページでは文章の幅 */
 .whead-bg { background: var(--grape-bg); isolation: isolate; }
@@ -197,3 +201,4 @@ a { color: inherit; }
 .doc .thanks h2 { position: absolute; top: -13px; left: 14px; margin: 0; padding: 2px 12px; border: 0; background: var(--ink); color: var(--paper); font-size: 14px; letter-spacing: 0.12em; }
 .doc .thanks p { margin: 0 0 10px; }
 .doc code { font-family: var(--mono); font-size: 0.92em; }
+} /* @layer base */

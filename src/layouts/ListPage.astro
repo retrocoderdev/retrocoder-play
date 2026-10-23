@@ -1,0 +1,108 @@
+---
+// トップ（すべての作品）と、タグごとの一覧ページ（/tags/<名前>/）。JavaScript を使わない静的なページ
+import TagLink from '../components/TagLink.astro';
+import WorkCard from '../components/WorkCard.astro';
+import { LIST_IMAGE, LIST_IMAGE_ALT, SITE_NAME, TAGS, type Tag } from '../lib/site';
+import { getWorks } from '../lib/works';
+import Base from './Base.astro';
+// base.css（Base.astro が読む）の後に読む
+import '../styles/list.css';
+
+interface Props {
+  // 絞り込むタグ。なければトップ
+  tag?: Tag;
+}
+
+const { tag } = Astro.props;
+const works = await getWorks();
+// 一覧のタグの並びは TAG_SLUGS の順。どの作品にも付いていないタグは出さない
+const used = TAGS.filter((t) => works.some((w) => w.tags.includes(t)));
+const listed = tag ? works.filter((w) => w.tags.includes(tag)) : works;
+const head = tag
+  ? { title: `${tag}の投稿作品 - ${SITE_NAME}`, ogTitle: `${tag}の投稿作品`, description: `${SITE_NAME}の投稿作品のうち、「${tag}」のもの。` }
+  : { title: SITE_NAME, description: '1980 年代のパソコン向けのオリジナルのゲームやデモを、ブラウザーでそのまま遊べる投稿作品のサイト。FM-7 / FM77AV の作品は WebM7 で動きます。' };
+---
+<Base {...head} image={LIST_IMAGE} imageAlt={LIST_IMAGE_ALT}>
+<header>
+  <div class="hero">
+    <div class="hero-in burst">
+      <h1><picture>
+        <source type="image/avif" srcset="/img/header_logo_640.avif 640w, /img/header_logo_1280.avif 1280w" sizes="calc(min(100vw / 3, 420px) * 1.5)">
+        <img class="logo" src="/img/header_logo_640.png" width="640" height="306" alt="プレイ！レトロPC！" fetchpriority="high">
+      </picture></h1>
+      <picture>
+        <source type="image/avif" srcset="/img/header_chara_600.avif 600w, /img/header_chara_1200.avif 1200w" sizes="calc(min(100vw / 3, 420px) * 1.4)">
+        <img class="chara" src="/img/header_chara_600.png" width="600" height="416" alt="">
+      </picture>
+      <a class="me" href="https://x.com/hone2bones"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>retrocoder <small>@hone2bones</small></a>
+      <a class="wanted" href="#post">投稿作品募集中！</a>
+    </div>
+  </div>
+  <div class="stripes under" aria-hidden="true"></div>
+</header>
+<main>
+  <div class="wrap">
+    <section class="about" aria-labelledby="about-h">
+      <h2 class="corner" id="about-h">
+        <span class="tab"><svg viewBox="0 0 32 32" aria-hidden="true"><!-- ブラウン管のモニター -->
+          <rect x="2" y="3" width="28" height="21" rx="2" fill="currentColor"/><rect x="5" y="6" width="22" height="15" rx="1" fill="#1f6fd1"/>
+          <rect x="7" y="8" width="6" height="2" fill="#ffe14d"/><rect x="7" y="12" width="10" height="2" fill="#fbfbf8"/>
+          <path d="M11 24h10l2 5H9z" fill="currentColor"/>
+        </svg>プレイ！レトロPC！とは</span><span class="en" aria-hidden="true">ABOUT</span><span class="line" aria-hidden="true"></span>
+      </h2>
+      <p>1980 年代のパソコン向けに作られた<strong>オリジナルのゲームやデモ</strong>を、ブラウザーでそのまま遊べる投稿作品のコーナーです。FM シリーズの作品は Naomitsu Tsugiiwa 氏（7032）作のエミュレーター <a href="https://github.com/7032JP/WebM7">WebM7</a> と互換 ROM（<a href="https://github.com/7032JP/7032AltROMs">7032 Alternative ROMs</a>）で動いています。<a href="/fm7/credits/">ライセンス</a></p>
+    </section>
+    <h2 class="corner" id="works">
+      <span class="tab"><svg viewBox="0 0 32 32" aria-hidden="true"><!-- 3.5 インチのフロッピーディスク: 本体、シャッター、ラベル -->
+        <path d="M3 2h22l5 5v22a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="currentColor"/>
+        <rect x="9" y="2" width="13" height="9" rx="1" fill="#c9cbcd"/><rect x="17" y="3.5" width="3" height="6" fill="#111"/>
+        <rect x="6" y="16" width="20" height="12" rx="1" fill="#111"/>
+        <rect x="8" y="19" width="16" height="1.6" fill="#d7261e"/><rect x="8" y="23" width="11" height="1.6" fill="#1f6fd1"/>
+      </svg>投稿作品</span><span class="en" aria-hidden="true">READERS' WORKS</span><span class="line" aria-hidden="true"></span>
+    </h2>
+    <nav class="tagbar" aria-label="タグで絞り込む"><TagLink current={tag} count={works.length} />{used.map((t) => <TagLink tag={t} current={tag} count={works.filter((w) => w.tags.includes(t)).length} />)}</nav>
+    <ul class="works">
+{listed.map((w) => <WorkCard work={w} />)}
+    </ul>
+
+    <section class="notes" id="notes" aria-labelledby="notes-h">
+      <h2 class="corner" id="notes-h">
+        <span class="tab"><svg viewBox="0 0 32 32" aria-hidden="true"><!-- 虫眼鏡 -->
+          <circle cx="13" cy="13" r="9" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="13" cy="13" r="5.5" fill="#1f6fd1"/>
+          <rect x="7.5" y="10" width="4" height="2" fill="#fbfbf8"/><path d="M19 21l3-3 8 8-3 3z" fill="currentColor"/>
+        </svg>技術解説</span><span class="en" aria-hidden="true">TECHNICAL NOTES</span><span class="line" aria-hidden="true"></span>
+      </h2>
+      <div class="soon">
+        <span class="stamp" aria-hidden="true">COMING SOON!</span>
+        <h3>ただいま記事を準備中！</h3>
+        <p>投稿作品の裏側を解説する記事を準備しています。FM-7 / FM77AV のハードウェアを、アセンブリでどう動かしているのかを紹介する予定です。</p>
+        <ul aria-label="予定している話題">
+          <li>4096 色モード</li><li>線を引く LSI で塗りつぶす</li><li>サブ CPU との分担</li><li>FM 音源で BGM</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="post" id="post" aria-labelledby="post-h">
+      <h2 class="corner" id="post-h">
+        <span class="tab"><svg viewBox="0 0 32 32" aria-hidden="true"><!-- 封筒 -->
+          <rect x="2" y="7" width="28" height="19" rx="1" fill="currentColor"/><path d="M4 9l12 9 12-9" fill="none" stroke="#ffe14d" stroke-width="2.4"/>
+        </svg>作品募集</span><span class="en" aria-hidden="true">WANTED</span><span class="line" aria-hidden="true"></span>
+      </h2>
+      <div class="box">
+        <h3>あなたの作品を載せませんか？</h3>
+        <p>1980 年代のパソコン向けに作った、オリジナルのゲームやデモを募集しています。今の時代に作った新作も、当時作ったものも大歓迎です。</p>
+        <ul>
+          <li>FM-7 / FM77AV の作品（ディスクイメージ D77）。WebM7 と互換 ROM で動くもの</li>
+          <li>ご自分で作ったもの（ほかの人の作品の写しや、市販のソフトは載せられません）</li>
+          <li>載せるときのライセンスは作者が決めます（MIT License、無断転載・再配布禁止など）</li>
+        </ul>
+        <p>投稿の受け付けの仕組みはまだありません。まずは X かメールで気軽にご連絡ください。</p>
+        <ul class="contact">
+          <li><a href="https://x.com/hone2bones"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>X @hone2bones</a></li>
+          <li><a href="mailto:info@retrocoder.dev"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M2 5h20v14H2zm2 2v.5l8 5 8-5V7zm0 2.9V17h16V9.9l-8 5z"/></svg>info@retrocoder.dev</a></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</main>
+</Base>

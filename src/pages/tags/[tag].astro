@@ -1,0 +1,16 @@
+---
+// タグごとの一覧ページ /tags/<名前>/。どれかの作品に付いているタグだけ作る
+import type { GetStaticPaths } from 'astro';
+import ListPage from '../../layouts/ListPage.astro';
+import { TAG_SLUGS, TAGS } from '../../lib/site';
+import { getWorks } from '../../lib/works';
+
+export const getStaticPaths = (async () => {
+  const works = await getWorks();
+  return TAGS.filter((tag) => works.some((w) => w.tags.includes(tag)))
+    .map((tag) => ({ params: { tag: TAG_SLUGS[tag] }, props: { tag } }));
+}) satisfies GetStaticPaths;
+
+const { tag } = Astro.props;
+---
+<ListPage tag={tag} />

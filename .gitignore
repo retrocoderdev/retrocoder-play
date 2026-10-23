@@ -1,5 +1,6 @@
-# ビルドの生成物（tools/build.py）
+# ビルドの生成物（astro build）と、Astro が作る型
 dist/
+.astro/
 .DS_Store
 __pycache__/
 

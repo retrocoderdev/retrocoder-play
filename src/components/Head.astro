@@ -1,0 +1,54 @@
+---
+// <head> の中身: title・description・canonical・OGP・アイコン・フォント。共通の CSS は layouts/Base.astro が読む
+import { FONTS, ORIGIN, SITE_NAME } from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+  // / から始まる 1200×630 の画像
+  image?: string;
+  imageAlt?: string;
+  // false にすると検索に出さない（404）
+  index?: boolean;
+  // 共有したときの題（サイト名は og:site_name で別に伝わるので、ふつうは付けない）
+  ogTitle?: string;
+}
+
+const { title, description, image, imageAlt = '', index = true, ogTitle } = Astro.props;
+const url = ORIGIN + Astro.url.pathname;
+---
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{title}</title>
+<meta name="description" content={description}>
+<meta name="theme-color" content="#3b1d63">
+{index ? (
+  <>
+    <link rel="canonical" href={url}>
+    <meta property="og:site_name" content={SITE_NAME}>
+    <meta property="og:locale" content="ja_JP">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content={ogTitle ?? title}>
+    <meta property="og:description" content={description}>
+    <meta property="og:url" content={url}>
+    {image ? (
+      <>
+        <meta property="og:image" content={ORIGIN + image}>
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:alt" content={imageAlt}>
+        <meta name="twitter:card" content="summary_large_image">
+      </>
+    ) : (
+      <meta name="twitter:card" content="summary">
+    )}
+  </>
+) : (
+  <meta name="robots" content="noindex">
+)}
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href={FONTS}>

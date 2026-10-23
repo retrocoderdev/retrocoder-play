@@ -4,12 +4,12 @@
     python3 tools/ogimage.py
 
 - fm7/works/<作品>/og.png: 帯と題名、モニターに入れたサムネイル（thumb.png）、キャッチコピー
-- site/og.jpg: トップ。ぶどう色の地（16 進ダンプと集中線）にヘッダーの絵（art/ のロゴと女の子）と紹介文。PNG では重いので JPEG にする
-- site/favicon.svg・site/favicon-32.png・site/apple-touch-icon.png（180×180）: 黒地に横じまと、青い丸の ▶
+- public/og.jpg: トップ。ぶどう色の地（16 進ダンプと集中線）にヘッダーの絵（art/ のロゴと女の子）と紹介文。PNG では重いので JPEG にする
+- public/favicon.svg・public/favicon-32.png・public/apple-touch-icon.png（180×180）: 黒地に横じまと、青い丸の ▶
 
 OGP 画像は手元の Chrome（画面なし）で HTML を撮る（文字を Web フォントで描くため）。Chrome の場所は
 環境変数 CHROME で変えられる。アイコンは形が単純なので Python だけで描く。作ったものはリポジトリに置き、
-tools/build.py はそれを写すだけ（build.py に Chrome は要らない）。
+サイトのビルド（astro build）はそれを写すだけ（ビルドに Chrome は要らない）。
 """
 import html
 import json
@@ -26,7 +26,7 @@ CHROME = os.environ.get('CHROME', '/Applications/Google Chrome.app/Contents/MacO
 FONTS = ('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&family=M+PLUS+1+Code:wght@700'
          '&family=Zen+Kaku+Gothic+New:wght@400;700&display=block')
 
-# 1200×630 の紙面に共通の CSS（色は site/base.css と同じ）
+# 1200×630 の紙面に共通の CSS（色は src/styles/base.css と同じ）
 CSS = '''
 * { box-sizing: border-box; }
 html { --grape-bg: url(HEXDUMP) 0 0 / 640px 352px, #3b1d63; }
@@ -79,7 +79,7 @@ def work_page(w, thumb):
     e = html.escape
     label = 'FM77AV40' if w.get('av40') else 'FM77AV'
     catch = e(w.get('catch', '')).replace('\n', '<br>')
-    img = ROOT / 'site/img'
+    img = ROOT / 'public/img'
     return f'''<div class="band" style="--bx:315px;--by:87px">
   <div class="burst"></div>
   <div class="art"><img class="chara" src="{(img / 'header_chara_1200.avif').as_uri()}"><img class="logo" src="{(img / 'header_logo_1280.avif').as_uri()}"></div>
@@ -100,7 +100,7 @@ def top_page(thumbs):
     1200×630 に入れ、下に横じまと紹介文。ロゴの元の絵は左右に透明な所がある（文字は横 2172 のうち 352〜1868）ので、
     その分だけ左へずらす。thumbs は使わない（作品が増えても変えない）"""
     logo, chara = (ROOT / f'art/header_{n}.png' for n in ('logo', 'chara'))
-    hexdump = ROOT / 'site/img/hexdump.svg'
+    hexdump = ROOT / 'public/img/hexdump.svg'
     burst = 'repeating-conic-gradient(rgba(255,255,255,.075) 0 5deg,transparent 5deg 12deg)'
     return f'''<div style="position:relative;height:520px;overflow:hidden;background:url({hexdump.as_uri()}) 0 0/640px 352px,#3b1d63">
   <div style="position:absolute;left:900px;top:310px;width:3000px;height:3000px;transform:translate(-50%,-50%);background:{burst}"></div>
@@ -113,7 +113,7 @@ def top_page(thumbs):
 
 
 def page_css():
-    return CSS.replace('HEXDUMP', (ROOT / 'site/img/hexdump.svg').as_uri())
+    return CSS.replace('HEXDUMP', (ROOT / 'public/img/hexdump.svg').as_uri())
 
 
 def shoot(body, out):
@@ -200,9 +200,9 @@ FAVICON_SVG = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
 
 
 def main():
-    site = ROOT / 'site'
+    site = ROOT / 'public'
     (site / 'favicon.svg').write_text(FAVICON_SVG)
-    print('site/favicon.svg')
+    print('public/favicon.svg')
     write_png(site / 'favicon-32.png', icon_pixels(32))
     write_png(site / 'apple-touch-icon.png', icon_pixels(180))
 

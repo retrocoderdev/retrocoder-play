@@ -1,0 +1,10 @@
+---
+// 仕様の表の 1 行。値は中身（slot）に書く。note があれば、値の下に小さく補足を出す
+interface Props {
+  term: string;
+  note?: string;
+}
+
+const { term, note } = Astro.props;
+---
+<dt>{term}</dt><dd><slot />{note && <small>{note}</small>}</dd>
