@@ -1,0 +1,22 @@
+---
+// 全ページの外枠: <head>（components/Head.astro と共通の CSS）、中身、フッター。
+// 中身の後に置くもの（プレイヤーの script）は slot="end"、<head> に足すものは slot="head"
+import Footer from '../components/Footer.astro';
+import Head from '../components/Head.astro';
+import type { ComponentProps } from 'astro/types';
+import '../styles/base.css';
+
+type Props = ComponentProps<typeof Head>;
+---
+<!doctype html>
+<html lang="ja">
+<head>
+<Head {...Astro.props} />
+<slot name="head" />
+</head>
+<body>
+<slot />
+<Footer />
+<slot name="end" />
+</body>
+</html>

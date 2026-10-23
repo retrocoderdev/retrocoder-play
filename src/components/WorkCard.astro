@@ -1,0 +1,12 @@
+---
+// 一覧のカード。題名のリンクがカード全体を覆い（.title a::after）、タグのリンクはその上に重ねる
+import type { Work } from '../lib/works';
+import TagLink from './TagLink.astro';
+
+interface Props {
+  work: Work;
+}
+
+const { work } = Astro.props;
+---
+<li class="work"><div class="mon">{work.thumb ? <img src={work.thumb} alt="" width="640" height="400" loading="lazy"> : <span class="noimg"></span>}<div class="chin"><span class="lamps" aria-hidden="true"><span class="drive"><i class="lamp"></i><b>1</b></span><span class="drive"><i class="lamp"></i><b>0</b></span><span><i class="lamp pwr"></i>電源</span></span></div></div><div class="stripes"></div><div class="meta"><div class="tags">{work.tags.map((t) => <TagLink tag={t} />)}</div><h3 class="title"><a href={work.path}><span>{work.data.title}</span></a></h3><p class="desc">{work.data.description}</p></div></li>

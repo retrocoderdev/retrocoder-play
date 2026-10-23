@@ -1,0 +1,32 @@
+---
+// 題の帯（作品・ライセンス・404）。kind は題名の上の札の文字
+import { SITE_NAME } from '../lib/site';
+
+interface Props {
+  kind: string;
+  title: string;
+}
+
+const { kind, title } = Astro.props;
+---
+<header class="whead">
+  <div class="whead-bg">
+    <div class="whead-in">
+      <a class="art burst" href="/" aria-label={`${SITE_NAME}（トップへ）`}>
+        <picture>
+          <source type="image/avif" srcset="/img/header_chara_600.avif 600w, /img/header_chara_1200.avif 1200w" sizes="220px">
+          <img class="chara" src="/img/header_chara_600.png" width="600" height="416" alt="">
+        </picture>
+        <picture>
+          <source type="image/avif" srcset="/img/header_logo_640.avif 640w, /img/header_logo_1280.avif 1280w" sizes="220px">
+          <img class="logo" src="/img/header_logo_640.png" width="640" height="306" alt="">
+        </picture>
+      </a>
+      <div class="ttl">
+        <span class="kind">{kind}</span>
+        <h1>{title}</h1>
+      </div>
+    </div>
+  </div>
+  <div class="stripes" aria-hidden="true"></div>
+</header>

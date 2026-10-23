@@ -1,0 +1,30 @@
+# 型と work.json の中身を確かめ、サイトを組み立てられることを確かめる（配るのは人が cf deploy で行う）
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # アクションは版の名前ではなくコミットで固定する（名前は付け替えられるため）
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Node の版は mise.toml から読む（手元と同じ）
+      - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
+      # インストールのスクリプトは回さない（ビルドには要らない。cf が使う workerd のものだけ）
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm run build

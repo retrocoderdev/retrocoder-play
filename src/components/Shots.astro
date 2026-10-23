@@ -1,0 +1,12 @@
+---
+// モニターの下に並べる画面写真。雑誌の紙面のように、白いふちと番号と解説を付ける
+interface Props {
+  shots: { file: string; caption: string }[];
+}
+
+const { shots } = Astro.props;
+const MARKS = '①②③④⑤⑥';
+---
+{shots.length > 0 && (
+  <div class="shots">{shots.map((s, i) => <figure><img src={s.file} alt={`画面写真${MARKS[i]}`} width="640" height="400" loading="lazy"><figcaption><b>{MARKS[i]}</b>{s.caption}</figcaption></figure>)}</div>
+)}

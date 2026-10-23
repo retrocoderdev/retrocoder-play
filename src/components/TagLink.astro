@@ -1,0 +1,14 @@
+---
+// タグのリンク。tag がないときは「すべて」（トップ）。current と同じタグは塗りつぶし（aria-current）
+import { TAG_SLUGS, type Tag } from '../lib/site';
+
+interface Props {
+  tag?: Tag;
+  current?: Tag;
+  count?: number;
+}
+
+const { tag, current, count } = Astro.props;
+const href = tag ? `/tags/${TAG_SLUGS[tag]}/` : '/';
+---
+<a class="tag" href={href} aria-current={tag === current ? 'page' : undefined}>{tag ?? 'すべて'}{count !== undefined && <small>{count}</small>}</a>

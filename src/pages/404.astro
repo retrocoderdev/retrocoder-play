@@ -1,0 +1,13 @@
+---
+// 見つからない URL で Cloudflare Workers が返すページ（dist/404.html）。どの URL でも出るので、中のリンクは / から始める
+import WHead from '../components/WHead.astro';
+import Base from '../layouts/Base.astro';
+import { SITE_NAME } from '../lib/site';
+---
+<Base title={`ページが見つかりません - ${SITE_NAME}`} description="" index={false}>
+<WHead kind="お知らせ" title="ページが見つかりません" />
+<main class="doc">
+<p>お探しのページは、移動したか、なくなったようです。</p>
+<p><a href="/">← トップへ</a></p>
+</main>
+</Base>

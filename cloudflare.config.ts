@@ -1,4 +1,4 @@
-// Cloudflare Workers の設定（cf CLI が読む）。tools/build.py で作った dist/ を、静的なアセットとして配るだけの Worker。
+// Cloudflare Workers の設定（cf CLI が読む）。astro build で作った dist/ を、静的なアセットとして配るだけの Worker。
 // dist/ の場所は wrangler.config.ts（cf が中で使う Wrangler に渡す）。手順は AGENTS.md の「公開」
 import { defineConfig } from "cf/config";
 

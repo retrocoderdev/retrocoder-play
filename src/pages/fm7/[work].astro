@@ -1,0 +1,84 @@
+---
+// 作品のページ（/fm7/<作品>/）。クリック（タップ）でプレイヤー（fm7/player/player.js）が隣の disk.d77 を読んで起動する
+import type { GetStaticPaths } from 'astro';
+import { createHash } from 'node:crypto';
+import Lines from '../../components/Lines.astro';
+import Shots from '../../components/Shots.astro';
+import SpecRow from '../../components/SpecRow.astro';
+import WHead from '../../components/WHead.astro';
+import Base from '../../layouts/Base.astro';
+import { SITE_NAME } from '../../lib/site';
+import { ALTROMS_VERSION, getWorks, WEBM7_VERSION } from '../../lib/works';
+import playerJs from '../../../fm7/player/player.js?raw';
+import '../../../fm7/player/player.css';
+
+export const getStaticPaths = (async () => (await getWorks()).map((work) => ({ params: { work: work.id }, props: { work } }))) satisfies GetStaticPaths;
+
+const { work } = Astro.props;
+const w = work.data;
+// プレイヤーに渡す設定。</script> で埋め込みが切れないよう < をエスケープする
+const workJson = JSON.stringify({ title: w.title, machine: w.machine, boot: w.boot, touch: w.touch }).replaceAll('<', '\\u003c');
+// player.js はバンドルしないので、URL に中身から作った版を付ける（中身を変えたら、古いキャッシュを読まない）
+const playerVersion = createHash('sha256').update(playerJs).digest('hex').slice(0, 10);
+---
+<Base title={`${w.title} - ${SITE_NAME}`} description={w.description} image={work.og ?? undefined} imageAlt={`${w.title}の画面`} ogTitle={w.title}>
+<script type="application/json" id="work" slot="head" is:inline set:html={workJson} />
+<WHead kind="投稿作品" title={w.title} />
+<main>
+  <div class="stage">
+    <div class="monitor">
+      <div id="screen-wrap">
+        {work.thumb && <img id="poster" src="thumb.png" alt="">}
+        <canvas id="screen" width="640" height="200" role="img" aria-label="FM77AV の画面"></canvas>
+        <button id="start" type="button" aria-label="起動する" data-anim="shake" hidden>
+          <span class="go" aria-hidden="true"><svg viewBox="0 0 100 100">
+            <circle class="ring" cx="50" cy="50" r="47"/>
+            <circle class="disc" cx="50" cy="50" r="40"/>
+            <path class="tri" d="M40.5 33 L69 50 L40.5 67 Z"/>
+          </svg></span>
+          <span class="hint">クリック・タップで電源が入ります</span>
+        </button>
+        <p id="message" role="status">読み込み中…</p>
+      </div>
+      <div class="chin">
+        <span>{work.label}</span>
+        <span class="lamps" aria-hidden="true">
+          <span class="drive"><i class="lamp" data-drive="1"></i><b>1</b></span>
+          <span class="drive"><i class="lamp" data-drive="0"></i><b>0</b></span>
+          <span><i class="lamp pwr"></i>電源</span>
+        </span>
+      </div>
+    </div>
+    <Shots shots={w.shots} />
+    <div id="touch" hidden>
+      <div id="dpad">
+        <button type="button" data-code="ArrowUp" data-key="ArrowUp" class="up" aria-label="上">▲</button>
+        <button type="button" data-code="ArrowLeft" data-key="ArrowLeft" class="left" aria-label="左">◀</button>
+        <button type="button" data-code="ArrowRight" data-key="ArrowRight" class="right" aria-label="右">▶</button>
+        <button type="button" data-code="ArrowDown" data-key="ArrowDown" class="down" aria-label="下">▼</button>
+      </div>
+      <div id="buttons"></div>
+    </div>
+  </div>
+  <section class="spec">
+    {w.catch && <p class="catch"><span><Lines text={w.catch} /></span></p>}
+    <p class="lead">{w.lead ?? w.description}</p>
+    {w.comment && <aside class="comment"><h2>作者よりひとこと</h2><p><Lines text={w.comment} /></p></aside>}
+    <dl>
+      <SpecRow term="対応機種">{work.label} 以降</SpecRow>
+      {w.specs.map(([term, value, note]) => <SpecRow term={term} note={note}>{value}</SpecRow>)}
+      {w.author && <SpecRow term="作者">{w.author}</SpecRow>}
+      {w.published && <SpecRow term="公開日">{w.published_strike && <s>{w.published_strike}</s>}{w.published.replaceAll('-', '.')}</SpecRow>}
+      {w.license && <SpecRow term="ライセンス">{work.licenseTxt ? <a href="LICENSE.txt">{w.license}</a> : w.license}</SpecRow>}
+    </dl>
+    <h2>動作環境</h2>
+    <dl class="env">
+      <dt>エミュレーター</dt><dd><a href="https://github.com/7032JP/WebM7">WebM7</a><small>{WEBM7_VERSION}</small></dd>
+      <dt>ROM</dt><dd><a href="https://github.com/7032JP/7032AltROMs">7032 Alternative ROMs</a><small>{ALTROMS_VERSION}・互換 ROM</small></dd>
+    </dl>
+    <p class="note">純正 ROM は使っていません。WebM7 と互換 ROM は、どちらも Naomitsu Tsugiiwa 氏（7032）の作品です。FM 音源の部分は fmgen（© cisc）の移植です。<a href="/fm7/credits/">ライセンス</a></p>
+    <p class="back"><a href="/#works"><svg viewBox="0 0 10 12" width="10" height="12" aria-hidden="true"><path d="M9 1v10L1 6z" fill="currentColor"/></svg>投稿作品の一覧へ</a></p>
+  </section>
+</main>
+<script type="module" src={`../player.js?v=${playerVersion}`} slot="end" is:inline></script>
+</Base>
