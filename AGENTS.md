@@ -37,6 +37,7 @@ npm run check      # 型と work.json の中身を確かめる（astro check）
 ```
 
 - Node の版は `mise.toml`（Astro 7 は Node 22.23.4 以降が要る）
+- GitHub Actions（`.github/workflows/check.yml`）が、main への push と PR のたびに `npm run check` と `npm run build` を回す。配るのは人（`cf deploy`）。アクションはコミットの SHA で固定する
 - ページの `<head>`（title・description・canonical・OGP・アイコン・フォント）は `components/Head.astro`。共通の CSS は `layouts/Base.astro` が読む
 - トップとタグごとの一覧ページ（`/tags/<名前>/`。JavaScript を使わない静的なページ）は、`layouts/ListPage.astro` から作る
 - 全ページ共通のフッター（サイト名・ライセンス・ソースコードと、著作権の表示）は `components/Footer.astro`
